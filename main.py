@@ -26,7 +26,7 @@
 
 from functools import wraps
 
-from enums import Command
+from commands_enum import Command
 
 
 # ============================================
