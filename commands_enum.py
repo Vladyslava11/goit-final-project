@@ -6,6 +6,7 @@ from enum import Enum
 class Command(Enum):
     """Перелік доступних команд бота."""
     HELLO = "hello"
+    HELP = "help"
     ADD = "add"
     CHANGE = "change"
     PHONE = "phone"

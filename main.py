@@ -34,7 +34,7 @@ def suggest_command(user_input: str) -> str | None:
     from difflib import get_close_matches
     
     commands = [
-        "hello", "add", "change", "phone", "all", "delete",
+        "hello", "help", "add", "change", "phone", "all", "delete",
         "add-birthday", "show-birthday", "birthdays",
         "add-note", "edit-note", "delete-note", "find-note", "show-all-notes",
         "add-tag", "search-by-tag", "sort-notes-by-tag",
@@ -81,9 +81,10 @@ def main():
     notebook = load_data("notebook.pkl", Notebook)
 
     print("Ласкаво просимо до персонального помічника!")
+    print("Введіть 'help' для списку команд.")
 
     while True:
-        user_input = input("Введіть команду: ")
+        user_input = input("\nВведіть команду: ")
 
         if not user_input.strip():
             print("Будь ласка, введіть команду.")
@@ -100,21 +101,86 @@ def main():
         elif command == "hello":
             print("Чим можу допомогти?")
 
+        elif command == "help":
+            print("""
+📋 Доступні команди:
+
+👤 Робота з контактами:
+   add - додати новий контакт
+         Приклад: add Олександр 0991234567
+         Приклад: add Олександр 0991234567 alex@email.com
+         Приклад: add Олександр 0991234567 alex@email.com Київ
+         Приклад: add Олександр 0991234567 alex@email.com Київ 15.05.1990
+         Обов'язкові: ім'я, телефон
+         Необов'язкові: email, адреса, день народження
+
+   change - змінити дані контакту
+         Приклад: change Олександр phone 0999999999
+         Приклад: change Олександр address Київ вул. Садова 5
+         Приклад: change Олександр birthday 20.12.1985
+         Поля для зміни: phone, email, address, birthday
+
+   phone - показати номер телефону контакту
+         Приклад: phone Олександр
+
+   all - показати всі контакти
+
+   delete - видалити контакт
+         Приклад: delete Олександр
+
+   add-birthday - додати день народження
+         Приклад: add-birthday Олександр 15.05.1990
+
+   show-birthday - показати день народження контакту
+         Приклад: show-birthday Олександр
+
+   birthdays - показати дні народження найближчим часом
+         Приклад: birthdays (покаже на 7 днів)
+         Приклад: birthdays 30 (покаже на 30 днів)
+
+📝 Робота з нотатками:
+   add-note - додати нотатку
+         Приклад: add-note Покупки Купити молоко та хліб
+
+   edit-note - редагувати нотатку
+         Приклад: edit-note 1 Новий заголовок Новий текст
+
+   delete-note - видалити нотатку
+         Приклад: delete-note 1
+
+   find-note - шукати нотатку
+         Приклад: find-note Покупки
+
+   show-all-notes - показати всі нотатки
+
+🏷️ Робота з тегами:
+   add-tag - додати тег до нотатки
+         Приклад: add-tag 1 Покупки
+
+   search-by-tag - шукати нотатки за тегом
+         Приклад: search-by-tag Покупки
+
+   sort-notes-by-tag - сортувати нотатки за тегами
+
+🚪 Вихід:
+   close або exit - вийти та зберегти дані
+""")
+
         elif command == "add":
             # add [name] [phone] [email] [address] [birthday]
-            if len(args) < 3:
-                print("Використання: add <ім'я> <телефон> <email> [адреса] [день_народження]")
+            if len(args) < 2:
+                print("Використання: add <ім'я> <телефон> [email] [адреса] [день_народження]")
+                print("Обов'язкові поля: ім'я, телефон")
             else:
                 name = args[0]
                 phone = args[1]
-                email = args[2]
                 
-                # Адреса та день народження - все що після email
+                # Email, адреса та день народження - все що після телефону
+                email = None
                 address = None
                 birthday = None
-                if len(args) > 3:
-                    # Шукаємо день народження (формат ДД.ММ.РРРР)
-                    remaining = args[3:]
+                if len(args) > 2:
+                    remaining = args[2:]
                     bday_idx = None
                     for i, arg in enumerate(remaining):
                         if len(arg) == 10 and arg[2] == '.' and arg[5] == '.':
@@ -122,25 +188,29 @@ def main():
                             break
                     
                     if bday_idx is not None:
-                        address = " ".join(remaining[:bday_idx]) if bday_idx > 0 else None
+                        # Email - перше слово перед датою
+                        if bday_idx > 0:
+                            email = remaining[0]
+                            address = " ".join(remaining[1:bday_idx]) if bday_idx > 1 else None
                         birthday = remaining[bday_idx]
                     else:
-                        address = " ".join(remaining)
+                        # Немає дня народження - все інше це email + адреса
+                        if len(remaining) >= 1:
+                            email = remaining[0]
+                        if len(remaining) > 1:
+                            address = " ".join(remaining[1:])
                 
                 # Перевірка обов'язкових полів
                 if not name or not name.strip():
                     print("❌ Ім'я є обов'язковим.")
                 elif not phone or not phone.strip():
                     print("❌ Телефон є обов'язковим.")
-                elif not email or not email.strip():
-                    print("❌ Email є обов'язковим.")
-                elif address and not address.strip():
-                    print("❌ Адреса не може бути порожньою.")
                 else:
                     try:
                         record = Record(name)
                         record.add_phone(phone)
-                        record.set_email(email)
+                        if email:
+                            record.set_email(email)
                         if address:
                             record.set_address(address)
                         if birthday:
