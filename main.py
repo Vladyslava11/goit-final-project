@@ -1,5 +1,6 @@
 """Головний файл бота-асистента."""
 
+from datetime import datetime
 from notebook_module import Notebook
 from storage_module import save_data, load_data
 from address_book_module.address_book import AddressBook
@@ -42,31 +43,31 @@ def suggest_command(user_input: str) -> str | None:
     
     user_input_lower = user_input.lower().strip()
     
-    # Exact match
+    # Точний збіг
     if user_input_lower in commands:
         return None
     
-    # Try to find close matches
+    # Спроба знайти близькі збіги
     matches = get_close_matches(user_input_lower, commands, n=1, cutoff=0.6)
     if matches:
         return matches[0]
     
-    # Check if user is trying to add a contact but used wrong command
+    # Перевірка чи користувач намагається додати контакт
     add_patterns = ["додати", "додаю", "новий контакт", "new contact", "add contact"]
     if any(p in user_input_lower for p in add_patterns):
         return "add"
     
-    # Check if user is trying to find contact
+    # Перевірка чи користувач шукає контакт
     find_patterns = ["знайти", "пошук", "шукаю", "find", "search"]
     if any(p in user_input_lower for p in find_patterns):
         return "phone"
     
-    # Check if user wants to see all contacts
+    # Перевірка чи користувач хоче побачити всі контакти
     all_patterns = ["всі", "усі", "показати всіх", "all contacts", "show all"]
     if any(p in user_input_lower for p in all_patterns):
         return "all"
     
-    # Check if user wants to add a note
+    # Перевірка чи користувач хоче додати нотатку
     note_patterns = ["нотатку", "нотатка", "замітка", "note"]
     if any(p in user_input_lower for p in note_patterns):
         return "add-note"
@@ -101,37 +102,63 @@ def main():
 
         elif command == "add":
             # add [name] [phone] [email] [address] [birthday]
-            if len(args) < 2:
-                print("Використання: add <ім'я> <телефон> [email] [адреса] [день_народження]")
+            if len(args) < 3:
+                print("Використання: add <ім'я> <телефон> <email> [адреса] [день_народження]")
             else:
                 name = args[0]
                 phone = args[1]
-                email = args[2] if len(args) > 2 else None
-                address = args[3] if len(args) > 3 else None
-                birthday = args[4] if len(args) > 4 else None
-                try:
-                    record = Record(name)
-                    record.add_phone(phone)
-                    if email:
+                email = args[2]
+                
+                # Адреса та день народження - все що після email
+                address = None
+                birthday = None
+                if len(args) > 3:
+                    # Шукаємо день народження (формат ДД.ММ.РРРР)
+                    remaining = args[3:]
+                    bday_idx = None
+                    for i, arg in enumerate(remaining):
+                        if len(arg) == 10 and arg[2] == '.' and arg[5] == '.':
+                            bday_idx = i
+                            break
+                    
+                    if bday_idx is not None:
+                        address = " ".join(remaining[:bday_idx]) if bday_idx > 0 else None
+                        birthday = remaining[bday_idx]
+                    else:
+                        address = " ".join(remaining)
+                
+                # Перевірка обов'язкових полів
+                if not name or not name.strip():
+                    print("❌ Ім'я є обов'язковим.")
+                elif not phone or not phone.strip():
+                    print("❌ Телефон є обов'язковим.")
+                elif not email or not email.strip():
+                    print("❌ Email є обов'язковим.")
+                elif address and not address.strip():
+                    print("❌ Адреса не може бути порожньою.")
+                else:
+                    try:
+                        record = Record(name)
+                        record.add_phone(phone)
                         record.set_email(email)
-                    if address:
-                        record.set_address(address)
-                    if birthday:
-                        record.add_birthday(birthday)
-                    book.add_record(record)
-                    print(f"✅ Контакт '{name}' додано.")
-                except ValueError as e:
-                    print(e)
+                        if address:
+                            record.set_address(address)
+                        if birthday:
+                            record.add_birthday(birthday)
+                        book.add_record(record)
+                        print(f"✅ Контакт '{name}' додано.")
+                    except ValueError as e:
+                        print(e)
 
         elif command == "change":
-            # change [name] [phone] [email] [address]
+            # change [name] [поле] [значення]
             if len(args) < 3:
                 print("Використання: change <ім'я> <поле> <значення>")
-                print("Поля: phone, email, address")
+                print("Поля: phone, email, address, birthday")
             else:
                 name = args[0].lower()
                 field = args[1].lower()
-                value = args[2]
+                value = " ".join(args[2:])  # Об'єднуємо все після поля
                 if name in book.data:
                     try:
                         record = book.data[name]
@@ -144,9 +171,13 @@ def main():
                             print(f"✅ Email для '{args[0]}' оновлено.")
                         elif field == "address":
                             record.set_address(value)
-                            print(f"✅ Адреса для '{args[0]}' оновлено.")
+                            print(f"✅ Адреса для '{args[0]}' оновлено/додано.")
+                        elif field == "birthday":
+                            record.add_birthday(value)
+                            print(f"✅ День народження для '{args[0]}' оновлено/додано.")
                         else:
                             print(f"❌ Невідоме поле: {field}")
+                            print("Доступні поля: phone, email, address, birthday")
                     except ValueError as e:
                         print(e)
                 else:
@@ -220,7 +251,6 @@ def main():
                     print("❌ Кількість днів має бути числом.")
                     pass
             
-            from datetime import datetime
             today = datetime.now().date()
             upcoming = []
             for record in book.data.values():

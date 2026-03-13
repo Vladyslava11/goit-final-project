@@ -35,5 +35,5 @@ class Record:
 
         return (
             f"👤 {self.name.value:<15} | 📞 {phones:<12} | "
-            f"📧 {email_str:<20} | 📍 {address_str:<15} | 🎂 {birthday_str}"
+            f"📧 {email_str:<20} | 📍 {address_str} | 🎂 {birthday_str}"
         )

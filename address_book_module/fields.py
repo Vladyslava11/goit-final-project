@@ -18,7 +18,10 @@ class Name(Field):
 
 # Клас для адреси
 class Address(Field):
-    pass
+    def __init__(self, value: str) -> None:
+        if not value or not value.strip():
+            raise ValueError("❌ Адреса не може бути порожньою.")
+        super().__init__(value.strip())
 
 
 # Клас для телефону, перевіряє формат номера при ініціалізації
