@@ -16,6 +16,11 @@ class Name(Field):
     pass
 
 
+# Клас для адреси
+class Address(Field):
+    pass
+
+
 # Клас для телефону, перевіряє формат номера при ініціалізації
 class Phone(Field):
     def __init__(self, value: str) -> None:
