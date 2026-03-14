@@ -392,7 +392,7 @@ def main():
                 if results:
                     print("🔍 Результати пошуку:")
                     for note in results:
-                        print(note)
+                        print(repr(note))
                 else:
                     print("Нотаток не знайдено.")
 
@@ -401,7 +401,7 @@ def main():
             notes = notebook.get_all_notes()
             if notes:
                 for note in notes:
-                    print(note)
+                    print(repr(note))
             else:
                 print("Нотаток немає.")
 

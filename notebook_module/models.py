@@ -72,3 +72,16 @@ class Note:
         tags_str = ", ".join(str(t) for t in self.tags) if self.tags else "без тегів"
         date_str = self.created_at.strftime("%d.%m.%Y")
         return f"[{self.note_id}] {self.title} | Теги: {tags_str} | {date_str}"
+
+    def __repr__(self):
+        """Повне представлення нотатки з текстом."""
+        tags_str = ", ".join(str(t) for t in self.tags) if self.tags else "без тегів"
+        date_str = self.created_at.strftime("%d.%m.%Y")
+        return (
+            f"─── Нотатка #{self.note_id} ───\n"
+            f"📌 Заголовок: {self.title}\n"
+            f"📝 Текст: {self.body}\n"
+            f"🏷️ Теги: {tags_str}\n"
+            f"📅 Дата: {date_str}\n"
+            f"────────────────────"
+        )
