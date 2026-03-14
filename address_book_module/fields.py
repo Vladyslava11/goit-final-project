@@ -16,6 +16,14 @@ class Name(Field):
     pass
 
 
+# Клас для адреси
+class Address(Field):
+    def __init__(self, value: str) -> None:
+        if not value or not value.strip():
+            raise ValueError("❌ Адреса не може бути порожньою.")
+        super().__init__(value.strip())
+
+
 # Клас для телефону, перевіряє формат номера при ініціалізації
 class Phone(Field):
     def __init__(self, value: str) -> None:
@@ -62,6 +70,12 @@ class Birthday(Field):
             date_obj = datetime.strptime(value, "%d.%m.%Y").date()
             super().__init__(date_obj)
         except ValueError as e:
+            # Перевіряємо, чи помилка пов'язана з днем місяця (наприклад, 29.02 в невисокосний рік)
+            if "day" in str(e).lower() and "range" in str(e).lower():
+                raise ValueError(
+                    "❌ Некоректна дата. Перевірте, чи існує вказаний день у цьому місяці. "
+                    "Наприклад, 29.02.2023 не існує (2023 не високосний рік)."
+                ) from e
             raise ValueError("❌ Формат дати має бути ДД.ММ.РРРР") from e
 
     def __str__(self) -> str:
