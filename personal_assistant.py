@@ -88,6 +88,7 @@ def main():
 
         if not user_input.strip():
             print("Будь ласка, введіть команду.")
+            print("Введіть 'help' для списку доступних команд.")
             continue
 
         command, args = parse_input(user_input)
@@ -451,6 +452,7 @@ def main():
                 print(f"❌ Невідома команда. Можливо, ви мали на увазі '{suggestion}'?")
             else:
                 print("Невідома команда.")
+            print("Введіть 'help' для списку доступних команд.")
 
 
 if __name__ == "__main__":

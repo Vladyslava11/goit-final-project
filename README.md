@@ -10,11 +10,24 @@ git clone <repository-url>
 cd goit-final-project
 ```
 
-2. No external dependencies required - uses only Python standard library.
+2. Install the package:
+```bash
+pip install -e .
+```
 
 3. Run the assistant:
 ```bash
-python3 main.py
+personal-assistant
+```
+
+Or run as a module:
+```bash
+python -m personal-assistant
+```
+
+Or directly:
+```bash
+python personal_assistant.py
 ```
 
 ## Functionality
@@ -91,21 +104,23 @@ The assistant supports the following operations:
 
 ```
 goit-final-project/
-├── main.py                     # Main entry point with command loop
+├── personal_assistant.py       # Main entry point
+├── __main__.py                 # Module entry point
 ├── commands_enum.py            # Command enumeration
-├── address_book_module/        # Address book module
+├── pyproject.toml             # Package configuration
+├── README.md                  # This file
+├── address_book_module/       # Address book module
+│   ├── __init__.py           # Package init
+│   ├── address_book.py      # AddressBook class
+│   ├── fields.py            # Field classes
+│   └── record.py            # Record class
+├── notebook_module/          # Notes module
 │   ├── __init__.py
-│   ├── address_book.py        # AddressBook class
-│   ├── fields.py              # Field classes (Name, Phone, Email, Address, Birthday)
-│   └── record.py              # Record class
-├── notebook_module/           # Notes module
-│   ├── __init__.py
-│   ├── notebook.py            # Notebook class
-│   └── models.py             # Note and Tag classes
-├── storage_module/            # Data persistence module
-│   ├── __init__.py
-│   └── storage.py            # save_data and load_data functions
-└── README.md                  # This file
+│   ├── notebook.py         # Notebook class
+│   └── models.py            # Note and Tag classes
+└── storage_module/          # Data persistence module
+    ├── __init__.py
+    └── storage.py           # save_data and load_data functions
 ```
 
 ## Running the Project
@@ -113,7 +128,19 @@ goit-final-project/
 To start the assistant, run:
 
 ```bash
-python3 main.py
+personal-assistant
+```
+
+Or as a module:
+
+```bash
+python -m personal-assistant
+```
+
+Or directly:
+
+```bash
+python personal_assistant.py
 ```
 
 ## Architecture
@@ -121,10 +148,10 @@ python3 main.py
 The project is built according to OOP principles:
 
 - **Enum** for bot commands ([`commands_enum.py`](commands_enum.py))
-- **Decorator** for error handling `input_error` ([`main.py`](main.py:10))
-- **Parser** for parsing user input ([`main.py`](main.py:24))
-- **`while True` loop** for continuous input waiting ([`main.py`](main.py:86))
-- **Intelligent command suggestion** ([`main.py`](main.py:32))
+- **Decorator** for error handling `input_error` ([`personal_assistant.py`](personal_assistant.py:10))
+- **Parser** for parsing user input ([`personal_assistant.py`](personal_assistant.py:24))
+- **`while True` loop** for continuous input waiting ([`personal_assistant.py`](personal_assistant.py:86))
+- **Intelligent command suggestion** ([`personal_assistant.py`](personal_assistant.py:32))
 
 ## Requirements
 

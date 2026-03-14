@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "personal-assistant"
+version = "1.0.0"
+description = "Personal Assistant - CLI bot for managing contacts and notes"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Author", email = "author@example.com"}
+]
+keywords = ["cli", "assistant", "contacts", "notes", "address-book"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business",
+]
+
+[project.scripts]
+personal-assistant = "personal_assistant:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["notebook_module*", "address_book_module*", "storage_module*"]
+exclude = ["tests*"]
+
+[tool.setuptools]
+py-modules = ["personal_assistant", "commands_enum", "__main__"]
